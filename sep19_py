@@ -1,0 +1,36 @@
+#!/bin/sh
+
+
+cat > if_elif.py << EOF
+#prg_1
+x = 2
+
+
+if x < 10:
+    print 'Less than ten'
+elif 10 <= x < 20:
+    print 'Less than twenty'
+else:
+    print 'Twenty or more'
+EOF
+
+python if_elif.py
+
+cat > if_short_alternative.py << EOF
+#prg_2
+x, y = 4, 3
+if x < y:
+     smaller = x
+else:
+     smaller = y
+print smaller
+
+#type2
+smaller = (x < y and [x] or [y])[0]
+print smaller
+
+#type3
+smaller = x if x < y else y
+print smaller
+EOF
+python if_short_alternative.py

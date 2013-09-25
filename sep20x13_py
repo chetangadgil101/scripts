@@ -1,0 +1,500 @@
+#!/bin/sh
+
+cat > try_catch_n_class.py << EOF
+
+#_ 26
+
+try: 
+    x = input('Enter the first number: ')
+    y = input('Enter the second number: ')
+    print x/y
+except ZeroDivisionError: 
+    print "The second number can't be zero!"
+
+class MyCalc:
+   muffled = 0
+   def calc(self, expr):
+      try:
+        return eval(expr)
+      except ZeroDivisionError:
+       if self.muffled:
+          print 'Division by zero is illegal'
+      else:
+          raise 
+
+calculator = MyCalc()
+calculator.calc('10/2')
+calculator.calc('10/0') # No muffling
+
+calculator.muffled = 1 
+calculator.calc('10/0')
+
+EOF
+
+python try_catch_n_class.py 
+
+cat > try_object.py << EOF
+
+#_ 27
+try:
+   x = input('Enter the first number: ')
+   y = input('Enter the second number: ')
+   print x/y 
+except (ZeroDivisionError, TypeError), e:
+   print e
+EOF
+python try_object.py 
+
+cat > try_catch_all.py << EOF
+#_ 28
+try: 
+    x = input('Enter the first number: ') 
+    y = input('Enter the second number: ') 
+    print x/y 
+except: 
+    print 'Something wrong happened..
+
+python try_catch_all.py 
+
+cat > try_success_else.py << EOF
+
+#_ 28
+# Have a block of code that is executed unless something bad happens
+try:
+   print 'A simple task' 
+except:
+   print 'What? Something went wrong?' 
+else:
+   print 'Ah...It went as planned.'
+
+EOF
+
+python try_success_else.py 
+
+
+cat > try_finally.py << EOF
+
+#_ 29
+
+try:
+    try:
+         ccfile = open('data.txt', 'r')
+         txns = ccfile.readlines()
+    except IOError:
+        log.write('no txns this month\n')
+finally:
+        ccfile.close()
+
+EOF
+python  try_finally.py 
+
+cat > try_success_else_path.py << EOF
+
+#_ 30
+try:
+   v = int( raw_input("Enter a value: "))
+   print "We got some valid input!"
+   x = 100 / v
+except (KeyboardInterrupt):
+   print "well, ok, if you don't really want to.."
+except ZeroDivisionError:
+   print "You can't divide by ZERO!"
+except:
+    print "Some other error happened here"
+else:
+    print "All went well, x = ", x
+EOF
+
+python try_success_else_path.py 
+
+cat > try_keyIntrupt.py << EOF
+#_ 31
+
+try:
+    name = raw_input("Enter your name: ")
+    print "You entered: " + name
+except KeyboardInterrupt:
+    print "You hit control-c"
+
+EOF
+python try_keyIntrupt.py 
+
+cat >  except_multiple.py  << EOF
+#_32
+def safe_float(obj):
+    try:
+        retval = float(obj)
+    except (ValueError, TypeError):
+        retval = 'argument must be a number or numeric string'
+    return retval
+
+safe_float('Spanish Inquisition')
+safe_float([])
+print safe_float('1.6')
+print safe_float(1.6)
+print safe_float(932)
+
+python except_multiple.py  
+
+cat > try_multiple_exceptions.py << EOF
+#_ 33
+
+def safe_float(obj):
+    try:
+         retval = float(obj)
+    except ValueError:
+        retval = 'could not convert non-number to float'
+    except TypeError:
+        retval = 'object type cannot be converted to float'
+    return retval
+EOF
+
+python try_multiple_exceptions.py 
+
+cat > try_assertion.py << EOF
+#_ 34
+
+try:
+    assert 1 == 0, 'One does not equal zero silly!'
+except AssertionError, args:
+    print '%s: %s' % (args.__class__.__name__, args)
+
+python try_assertion.py 
+
+cat > single_error_string_reprsnt.py << EOF
+
+#_ 35
+#replace our single error string with the string representation of the exception argument.
+def safe_float(object):
+  try:
+      retval = float(object)
+  except (ValueError, TypeError), diag:
+      retval = str(diag)
+  return retval
+
+safe_float('xyz')
+safe_float({})
+EOF
+
+python single_error_string_reprsnt.py 
+
+cat > exception_class.py << EOF
+#_ 36
+class B:
+      pass
+class C(B):
+      pass
+class D(C):
+      pass
+
+for c in [B, C, D]:
+      try:
+          raise c()
+      except D:
+          print "D" 
+      except C:
+          print "C" 
+      except B:
+          print "B"
+EOF
+python exception_class.py 
+
+cat > self_defined_exception.py <<  EOF
+#_ 37
+import math
+
+class NegativeNumberError( ArithmeticError ):
+   """Attempted improper operation on negative number."""
+   pass
+
+def squareRoot( number ):
+   """Computes square root of number. Raises NegativeNumberError
+   if number is less than 0."""
+
+   if number < 0:
+      raise NegativeNumberError, "Square root of negative number not permitted"
+
+   return math.sqrt( number )
+
+while 1:
+   try:
+      userValue = float( raw_input( "\nPlease enter a number: " ) )
+      print squareRoot( userValue )
+   except ValueError:
+      print "The entered value is not a number"
+   except NegativeNumberError, exception:
+      print exception
+   else:
+      break
+EOF
+
+python self_defined_exception.py 
+
+cat > exception_with_if_else.py << EOF
+#_ 38
+import sys
+
+try :
+        raise ValueError, "Got an error"
+except :
+        if sys.exc_type == ValueError :
+               print "Value Error"
+        else :
+               print "Something else"
+
+EOF
+python exception_with_if_else.py 
+
+cat > exception_class.py << EOF
+#_ 39
+class RangeException(Exception) :
+    def __init__(self, low, high) :
+        self.low = low
+        self.high = high
+    def __str__(self) :
+        s = "Expected value in range "+str(self.low)
+        s = s + " to "
+        s = s + str(self.high)
+        return s
+
+def CheckValue( inV ) :
+    if ( inV < 0 or inV > 10 ) :
+        raise RangeException(0,10)
+    return True
+
+CheckValue(12)
+
+import sys
+
+try :
+       CheckValue(12)
+except Exception:
+       print sys.exc_info()
+
+try :
+      CheckValue(12)
+except RangeException, re:
+      print "You didn't enter a value between: "+str(re.low)+", and "+str(re.high)
+
+EOF
+python exception_class.py 
+
+cat > exception_stack_unwinding.py << EOF
+#_ 40
+import traceback
+
+def function1():
+   function2()
+
+def function2():
+   function3()
+
+def function3():
+   # raise exception, catch exception, reraise exception
+   try:
+      raise Exception, "An exception has occurred"
+   except Exception:
+      print "Caught exception in function3. Reraising....\n"
+      raise   # reraises most recent exception
+
+# call function1, any Exception it generates will be
+# caught by the except clause that follows
+try:
+   function1()
+
+# output exception arguments, string representation of exception,
+# and the traceback
+except Exception, exception:
+   print "Exception caught in main program."
+   print "\nException arguments:", exception.args
+   print "\nException message:", exception
+   print "\nTraceback:"
+   traceback.print_exc()
+EOF
+python exception_stack_unwinding.py 
+
+cat > exception_stack_more.py << EOF
+#_ 41
+import sys, traceback, math
+
+try:
+    n = float(raw_input("Please, enter a number: "))
+    print "The sqrt of %f is %f" % (n, math.sqrt(n))
+
+except (ValueError, TypeError, OverflowError):
+    print "This is the standard traceback message:"
+    print ""
+    traceback.print_exc()
+    print "This is the customized traceback message:"
+    print ""
+    info = sys.exc_info()
+    exc_type = info[0]
+    exc_value = info[1]
+    exc_traceback = info[2]
+
+    trace = traceback.extract_tb(sys.exc_traceback)
+    print "Exception Type:  ", exc_type
+    print "Error Message:   ", exc_value
+    print "File name:       ", trace[0][0]
+
+    print "Error message:   ", trace[0][1]
+    print "Line:            ", trace[0][2]
+    print "Function:        ", trace[0][3]
+else:
+    print "Everything went just fine."
+EOF
+python exception_stack_more.py 
+
+cat > except_try.py << EOF
+
+#_ 42
+try:
+    x = raw_input("Enter an integer: ")
+    y = int(x)
+    print "Your number was", y
+except (TypeError, ValueError):
+    print "That didn't look like an integer to me."
+EOF
+
+python except_try.py 
+
+cat > except_finally_more.py << EOF
+
+#_ 43
+
+def doNotRaiseException():
+   try:
+      print "In doNotRaiseException"
+   finally:
+      print "Finally executed in doNotRaiseException"
+
+   print "End of doNotRaiseException"
+
+def raiseExceptionDoNotCatch():
+   try:
+      print "In raiseExceptionDoNotCatch"
+      raise Exception
+   finally:
+      print "Finally executed in raiseExceptionDoNotCatch"
+
+   print "Will never reach this point"
+
+print "Calling doNotRaiseException"
+doNotRaiseException()
+
+print "\nCalling raiseExceptionDoNotCatch"
+
+try:
+   raiseExceptionDoNotCatch()
+except Exception:
+   print "Caught exception from raiseExceptionDoNotCatch in main program."
+EOF
+python except_finally_more.py 
+
+cat > finally.py << EOF
+
+#_ 44
+try:
+   v = int( raw_input("Enter a value: "))
+   print "We got some valid input!"
+   x = 100 / v
+except (KeyboardInterrupt):
+   print "well, ok, if you don't really want to.."
+except ZeroDivisionError:
+   print "You can't divide by ZERO!"
+except:
+    print "Some other error happened here"
+else:
+    print "All went well, x = ", x
+finally:
+    print "This is executed no matter what!"
+
+
+EOF
+
+python finally.py 
+
+cat > import_else.py << EOF
+#_ 45
+import math as foobar 
+foobar.sqrt(4) 
+
+from math import sqrt as foobar 
+foobar(4)
+
+EOF
+python import_else.py
+
+cat > import_module.py << EOF
+#_ 46
+
+# Items in submodules must be accessed explicitly including the full package name:
+
+import os as computer
+print computer.path.abspath(".")
+
+import types 
+print types.FunctionType                        
+from types import FunctionType                
+print FunctionType
+
+EOF
+python import_module.py 
+
+cat > pass.py << EOF
+#_ 47
+name='tick'
+if name == 'tom': 
+    print 'Welcome!' 
+elif name == 'tick': 
+    pass 
+elif name == 'Bill Gates': 
+    print 'Access Denied'
+EOF
+
+python pass.py
+
+cat > raise.py << EOF
+#_ 48
+import exceptions, sys
+
+class ConfigError (exceptions.Exception):
+    def __init__(self, arg=None):
+        self.args = arg
+
+raise ConfigError, "Invalid header."
+
+python raise.py 
+
+cat > raise_err_from_func.py << EOF
+#_ 49
+import sys
+
+def excFunc() :
+    raise ValueError
+
+try:
+    excFunc()
+except:
+    print "Got an exception"
+    print sys.exc_info()
+
+EOF
+python raise_err_from_func.py
+
+cat > yield.py << EOF
+#_ 50
+def flatten(nested):
+    try:
+        for sublist in nested:
+            for element in flatten(sublist):
+                yield element
+    except TypeError:
+        yield nested
+
+print list(flatten([[[1],2],3,4,[5,[6,7]],8]))
+EOF
+python yield.py
+
+
+
